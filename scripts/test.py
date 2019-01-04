@@ -6,13 +6,19 @@ rospy.init_node('niryo_one_example_python_api')
 n = NiryoOne()
 pi = 3.14159
 z = .4
-x = .2
-n.move_pose(x, 0, z, 0, 0, 0)
-n.move_pose(x, 0, z, 0, pi/2, 0)
-n.move_pose(x, 0, z, 0, 0, 0)
-n.move_pose(x, 0, z, 0, -pi/2, 0)
-n.move_pose(x, 0, z, 0, 0, pi/2)
+x = .24
+gripper_length = .115
+gripper_length = 0
+
+n.move_pose(x - gripper_length, 0, z, 0, 0, 0)
+n.move_pose(x, 0, z + gripper_length, 0, pi/2, 0)
+n.move_pose(x - gripper_length, 0, z, 0, 0, 0)
+n.move_pose(x, -gripper_length, z, 0, -pi/2, 0)
+n.move_pose(x, + gripper_length, z, 0, 0, pi/2)
 n.move_pose(x, 0, z, 0, 0, -pi/2)
+n.activate_learning_mode(True)
+here
+
 n.move_joints([0, -0.321, -0.163, 0.029, 0.464, -0.015])
 n.move_joints([0.515, -0.836, -0.659, 0.501, 1.493, -0.035])
 n.move_joints([-1.179, -0.328, 0.507, -1.805, 1.218, -1.463])

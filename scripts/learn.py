@@ -5,6 +5,7 @@ from safe_move import limit_move, init, move_joints
 print 'START'
 init()
 niryo = NiryoOne()
+niryo.calibrate_auto()
 
 niryo.activate_learning_mode(True)
 
