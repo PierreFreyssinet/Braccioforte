@@ -3,13 +3,27 @@ import rospy
 import time
 rospy.init_node('niryo_one_example_python_api')
 
+home = [0, 0, -1.345, -0.009000000000000001, 0.009000000000000001, -0.005]
 n = NiryoOne()
 pi = 3.14159
+deg = pi / 180.
 z = .4
 x = .24
 gripper_length = .115
 gripper_length = 0
-
+n.instance.set_arm_max_velocity(100)
+n.move_joints(home)
+# moves = [x, y, z, r, p, yaw]
+moves = [[.15, 0],
+         [.25, 1],
+         [-.5, 1],
+         [.25, 1],
+         [.3, 2]]
+for v, a in moves:
+    print a, v, n.shift_pose(a, v);
+    
+n.move_joints(home)
+here
 n.move_pose(x - gripper_length, 0, z, 0, 0, 0)
 n.move_pose(x, 0, z + gripper_length, 0, pi/2, 0)
 n.move_pose(x - gripper_length, 0, z, 0, 0, 0)
