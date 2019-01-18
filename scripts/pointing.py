@@ -5,7 +5,10 @@ import time
 from numpy import *
 rospy.init_node('niryo_one_example_python_api')
 niryo = NiryoOne()
-niryo.calibrate_auto()
+try:
+    niryo.calibrate_auto()
+except NiryoOneException:
+    pass
 niryo.change_tool(TOOL_GRIPPER_2_ID)
 niryo.instance.set_arm_max_velocity(100)
 
