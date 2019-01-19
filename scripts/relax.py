@@ -5,5 +5,6 @@ from safe_move import init
 
 init()
 niryo = NiryoOne()
+niryo.calibrate_auto()
 niryo.activate_learning_mode(True)
 

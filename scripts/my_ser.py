@@ -30,7 +30,7 @@ def mean(l):
     out = sum(l) / float(len(l))
     return out
 
-MAX_MSG = 1000
+MAX_MSG = 10
 n_msg = 0
 while n_msg < MAX_MSG:
     msg =read()

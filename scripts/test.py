@@ -12,6 +12,8 @@ x = .24
 gripper_length = .115
 gripper_length = 0
 n.instance.set_arm_max_velocity(100)
+# n.calibrate_manual()
+n.calibrate_auto()
 n.move_joints(home)
 # moves = [x, y, z, r, p, yaw]
 moves = [[.15, 0],
