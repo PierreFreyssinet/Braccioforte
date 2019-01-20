@@ -7,8 +7,6 @@ import time
 import signal
 
 import CameraPublisher
-from guvcview_utils import set_guvcview_fps
-
 
 class DemoArUco(threading.Thread):
     def on_error_received(self, e):
@@ -41,21 +39,6 @@ class DemoArUco(threading.Thread):
 
     def start(self):
         print "Start %s ..." % self.name
-        try:
-            video_num = 1
-            set_guvcview_fps(7.5, video_num=video_num)
-            if False:
-                self._gvcview = subprocess.Popen([
-                    'guvcview', '-d', '/dev/video%d' % video_num,
-                    '-g', 'none', '-a', 'none', '-f', 'YUYV',
-                    '-x', '640x480'], #, '-F', '7.5'],
-                                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        except OSError as e:
-            if e.errno == os.errno.ENOENT:
-                print "guvcview not found"
-                print str(e)
-                exit()
-        # self._pid = self._gvcview.pid
         self.publisher.start()
         self.publisher.read_cfg('%s.cfg' % self.name)
         print "%s started" % self.name

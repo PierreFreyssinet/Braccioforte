@@ -5,18 +5,14 @@ import sys
 import time
 
 import CameraPublisher
-import DiceCounter
 import DemoArUco
-import FaceTracking
-import QRcode
 import rospy
-from geometry_msgs.msg import Point
+from std_msgs.msg import Int16MultiArray
 
 stop = False
 
-
-pub_xyv = rospy.Publisher('/jevois/attention/xyv', Point, queue_size=1)
-rospy.init_node('jevois_whisperer', anonymous=True)
+pub_aruco_n3 = rospy.Publisher('/jevois/ArUco/N3', Int16MultiArray, queue_size=1)
+rospy.init_node('jevois_talker', anonymous=True)
 
 def mean(l):
     out = sum(l) / float(len(l))
@@ -27,13 +23,15 @@ def publish(msg):
         vals = msg
         if vals[-1].endswith('OK'):
             vals[-1] = vals[-1][:-2]
-        if len(vals) == 11:
-            t, v, n, x0, y0, x1, y1, x2, y2, x3, y3 = vals
-            v = int(v[1:])
-            points = map(int, vals[3:])
-            x = mean(points[0::2])
-            y = mean(points[1::2])
-            pub_xyv.publish(x, y, v)
+        if len(vals) == 8:
+            ## type, value, x, y, z, L, W, D
+            t = vals[0]
+            if t == 'N3':
+                v = vals[1]
+                v = int(v[1:])
+                points = [v] + map(int, vals[2:])
+                pub_aruco_n3.publish(data=points)
+            
 
 def signal_handler(signal, frame):
     print('^C')
