@@ -52,7 +52,7 @@ class JevoisSerial:
 
     def send_command(self, cmd):
         self.ser.write(cmd + '\n')
-        print "Command sent:" + cmd
+        print "Command sent:" + cmd.strip()
 
     def get_ser(self):
         return self.ser

@@ -23,15 +23,18 @@ def publish(msg):
         vals = msg
         if vals[-1].endswith('OK'):
             vals[-1] = vals[-1][:-2]
-        if len(vals) == 8:
+        while len(vals) >= 8:
             ## type, value, x, y, z, L, W, D
             t = vals[0]
+            while t != 'N3' and t != '1N3' and len(vals) > 8:
+                vals = vals[1:]
+                t = vals[0]
             if t == 'N3':
                 v = vals[1]
                 v = int(v[1:])
                 points = [v] + map(int, vals[2:])
                 pub_aruco_n3.publish(data=points)
-            
+            vals = vals[8:]
 
 def signal_handler(signal, frame):
     print('^C')
