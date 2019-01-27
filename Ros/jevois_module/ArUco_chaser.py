@@ -87,7 +87,12 @@ for i in range(1):
     time.sleep(1)
 # niryo.move_pose(.2, 0.0, 0.020, 0, pi/2, 0)
 # niryo.move_pose(.15, 0.0, 0.010, 0, pi/2, 0)
+niryo.move_joints([0] * 6) 
+print niryo.get_arm_pose()
+here
 niryo.move_pose(.15, 0, 0.015, -pi/2, pi/2, 0)
+print niryo.get_joints()
+here
 
 # niryo.activate_learning_mode(True)
 # niryo.move_joints(start)

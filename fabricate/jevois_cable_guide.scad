@@ -16,9 +16,7 @@ difference(){
 // translate([-6, 0, 6])cube([12, 40, 6]);
 
 translate([-W/2, -H/2 - T, 0])cube([W, T, T]);
-
 translate([-8 - 6, -H/2 - T, 0])rotate(a=-90, v=[1, 0, 0]){
-
 intersection(){
   difference(){
     cylinder(r=6.2, h=T, $fn=50);
