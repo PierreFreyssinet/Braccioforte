@@ -1,6 +1,7 @@
 from __future__ import print_function
 import robot
-from scipy.optimize import fminbound
+from fminbound import fminbound
+# from scipy.optimize import fminbound
 from numpy import *
 
 DEG = pi/180.
