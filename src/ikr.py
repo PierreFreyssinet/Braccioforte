@@ -1,3 +1,4 @@
+from __future__ import print_function
 import robot
 from scipy.optimize import fminbound
 from numpy import *
@@ -68,12 +69,12 @@ def make_wrist_orthog(theta0, theta1, theta2, nhat, full_output=False):
     '''return theta3 so that wrist pivot is orthogonal to nhat
     '''
     ### rotate nhat by waist to put arm in r-z plane
-    nhat_rz = R_yaw(theta0) @ nhat
+    nhat_rz = dot(R_yaw(theta0), nhat)
     def minme(theta3):
         ahat = array([sin(theta3) * cos(theta1 + theta2),
                       cos(theta3),
                       sin(theta3) * sin(theta1 + theta2)])
-        return abs(ahat @ nhat_rz)
+        return abs(dot(ahat, nhat_rz))
     theta3 = fminbound(minme, -pi, pi)
     err = minme(theta3)
     out = theta3, err
@@ -116,10 +117,10 @@ def ikr(l0, l1, l2, rho, p, nhat, roll):
     out[:4] = theta0, theta1, theta2, theta3
     
     ### rotate hand to align with nhat
-    R0123 = R_roll(theta3) @ R_pitch(theta2 + theta1) @ R_yaw(theta0)
+    R0123 = dot(R_roll(theta3), dot(R_pitch(theta2 + theta1), R_yaw(theta0)))
     def minme(theta4):
         R = R_pitch(theta4)
-        return 1 - (nhat @ R[:,0])
+        return 1 - dot(nhat, R[:,0])
     out[4] = fminbound(minme, -pi, pi)
 
     out[5] = roll
