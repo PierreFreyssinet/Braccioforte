@@ -4,8 +4,6 @@ Coordinate frame library
 '''
 import numpy
 from numpy import linalg, sin, cos, dot, cross, pi, array, arctan2, sqrt, abs
-import pylab
-from scipy.optimize import fminbound
 DEG = pi/180
 I3 = numpy.eye(3)
 I6 = numpy.eye(6)
