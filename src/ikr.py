@@ -128,12 +128,12 @@ def ikr(l0, l1, l2, rho, p, nhat, roll):
         return -dot(nhat, R[:,0]) + abs(theta4)/1e8
     theta4 = arange(-pi, pi, .01)
     out[4] = fminbound(minme4, bounds[4, 0], bounds[4, 1])
-    import pylab
-    pylab.plot(theta4 / DEG, [minme4(t4) for t4 in theta4])
-    pylab.plot(out[4] / DEG, minme4(out[4]), 'ro')
-    pylab.plot(bounds[4, 0] / DEG, minme4(bounds[4, 0]), 'bo')
-    pylab.plot(bounds[4, 1] / DEG, minme4(bounds[4, 1]), 'bo')
-    pylab.show()
+    #import pylab
+    #pylab.plot(theta4 / DEG, [minme4(t4) for t4 in theta4])
+    #pylab.plot(out[4] / DEG, minme4(out[4]), 'ro')
+    #pylab.plot(bounds[4, 0] / DEG, minme4(bounds[4, 0]), 'bo')
+    #pylab.plot(bounds[4, 1] / DEG, minme4(bounds[4, 1]), 'bo')
+    #pylab.show()
     R = dot(R_pitch(out[4]), R0123)
     print('R:\n', R)
     print('minme4(out[4])', minme4(out[4]))
