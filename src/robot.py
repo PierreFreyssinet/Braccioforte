@@ -2,7 +2,6 @@ from __future__ import print_function
 '''
 Coordinate frame library
 '''
-import pylab
 import numpy
 from numpy import linalg, sin, cos, dot, cross, pi, array, arctan2, sqrt, abs
 import ikr
@@ -170,6 +169,7 @@ def inverse_kinematics_grad_descent(goal, angle_tol=1 * DEG, position_tol=1):
             x = numpy.arange(0, 1, .01)
             y = [minme(a) for a in x]
             alpha = fminbound(minme, -2, 2, xtol=.01)
+            # import pylab
             # pylab.clf()
             # pylab.plot(x, y)
             # pylab.plot(alpha, minme(alpha), 'ro')
@@ -220,6 +220,7 @@ def inverse_kinematics_ccd(goal, angle_tol=1 * DEG, position_tol=1):
 
             #vs = numpy.arange(theta[i] - 1 * DEG, theta[i] + 1 * DEG, .01 * DEG)
             #costs = [minme(v) for v in vs]
+            # import pylab
             #pylab.plot(vs / DEG, costs)
             #pylab.plot(theta[i], minme(theta[i]), 'ro')
             #print (i, theta[i], cost(theta))
