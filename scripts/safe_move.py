@@ -23,19 +23,27 @@ def limit_move(angles):
             angles[i] = stops[i]
     return angles
 
-def move_joints(niryo, angles, tries=5):
+def move_joints(niryo, angles, tries=3):
     angles = limit_move(angles)
     for k in range(tries - 1):
         try:
             niryo.move_joints(angles)
             break
         except NiryoOneException:
+            print ('move_joints attempt failed')
             pass
-    else:
+    else: ### allow exeption on last try
         niryo.move_joints(angles)
 
-def move_pose(niryo, x, y, z, roll, pitch, yaw):
-    niryo.move_pose(x, y, z, roll, pitch, yaw)
+def move_pose(niryo, x, y, z, roll, pitch, yaw, tries=3):
+    for k in range(tries - 1):
+        try:
+            niryo.move_pose(x, y, z, roll, pitch, yaw)
+        except NiryoOneException:
+            print ('move_pose attempt failed')
+            pass
+    else: ### allow exeption on last try
+        niryo.move_pose(x, y, z, roll, pitch, yaw)        
 
 if __name__ == '__main__':
     init()
