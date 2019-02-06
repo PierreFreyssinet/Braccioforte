@@ -1,5 +1,4 @@
 from __future__ import print_function
-import robot
 from fminbound import fminbound
 # from scipy.optimize import fminbound
 from numpy import *
@@ -48,7 +47,6 @@ def rz_to_thetas(l1, l2, rho, r, delta_z, tol=.001, max_iter=400, full_output=Fa
         offset = RHO * array([-sin(theta1 + theta2), cos(theta1 + theta2)])
         p = p_prime + offset
         return p
-    print('XXX', get_rz(-pi/2, pi/2), r, delta_z)
     theta1 = 0
     theta2 = 0
 
@@ -76,15 +74,15 @@ def rz_to_thetas(l1, l2, rho, r, delta_z, tol=.001, max_iter=400, full_output=Fa
 def make_wrist_orthog(theta0, theta1, theta2, nhat, full_output=False):
     '''return theta3 so that wrist pivot is orthogonal to nhat
     '''
-    ### rotate nhat by waist to put arm in r-z plane
-    nhat_rz = dot(R_yaw(theta0), nhat)
-    def minme(theta3):
-        ahat = array([sin(theta3) * cos(theta1 + theta2),
-                      cos(theta3),
-                      sin(theta3) * sin(theta1 + theta2)])
-        return abs(dot(ahat, nhat_rz))
-    theta3 = fminbound(minme, bounds[3, 0], bounds[3, 1])
-    err = minme(theta3)
+    R012 = dot(R_yaw(theta0), R_pitch(theta1 + theta2))
+    def minme3(theta3):
+        R = dot(R012, R_roll(theta3))
+        ahat = R[:,1]
+        out = abs(dot(ahat, nhat)) # + abs(theta3)*1e-8
+        return out
+    
+    theta3 = fminbound(minme3, bounds[3, 0], bounds[3, 1])
+    err = minme3(theta3)
     out = theta3, err
     if not full_output:
         out = out[0]
@@ -106,9 +104,7 @@ def ik_4d(l0, l1, l2, rho, p_wrist, nhat):
     ### 2 equation system for t1 and t2
     rxy = linalg.norm(p_wrist[:2])
     delta_z = p_wrist[2] - l0
-    print('YYY', p_wrist[2], l0, l1, l2, delta_z)
     theta1, theta2 = rz_to_thetas(l1, l2, rho, rxy, delta_z)
-
     ### adjust forarm to put wrist axis ahat orthogonal to nhat
     theta3 = make_wrist_orthog(theta0, theta1, theta2, nhat)
 
@@ -118,52 +114,70 @@ def ikr(l0, l1, l2, rho, p, nhat, roll):
     out = zeros(6)
     p_wrist = p - L3 * nhat
     print(format('      p', p))
-    print('     L3', L3)
     print(format('   nhat', nhat))
     print(format('p_wrist', p_wrist))
     
     
     theta0, theta1, theta2, theta3 = ik_4d(l0, l1, l2, rho, p_wrist, nhat)
     out[:4] = theta0, theta1, theta2, theta3
-    
-    ### rotate hand to align with nhat
-    R0123 = dot(R_roll(theta3), dot(R_pitch(theta2 + theta1), R_yaw(theta0)))
-    def minme(theta4):
-        R = dot(R_pitch(theta4), R0123)
-        return 1 - dot(nhat, R[:,0])
-    out[4] = fminbound(minme, bounds[4, 0], bounds[4, 1])
 
+    ### rotate hand to align with nhat
+    R0123 = dot(R_yaw(theta0), dot(R_pitch(theta1 + theta2), R_roll(theta3)))
+    def minme4(theta4): ### wrist angle
+        R = dot(R0123, R_pitch(theta4))
+        return -dot(nhat, R[:,0]) + abs(theta4)/1e8
+    theta4 = arange(-pi, pi, .01)
+    out[4] = fminbound(minme4, bounds[4, 0], bounds[4, 1])
+    import pylab
+    pylab.plot(theta4 / DEG, [minme4(t4) for t4 in theta4])
+    pylab.plot(out[4] / DEG, minme4(out[4]), 'ro')
+    pylab.plot(bounds[4, 0] / DEG, minme4(bounds[4, 0]), 'bo')
+    pylab.plot(bounds[4, 1] / DEG, minme4(bounds[4, 1]), 'bo')
+    pylab.show()
+    R = dot(R_pitch(out[4]), R0123)
+    print('R:\n', R)
+    print('minme4(out[4])', minme4(out[4]))
+    
     out[5] = roll
     return out
 
 fmt = '%10.4f'
 def format(name, v, fmt=fmt):
+    # print ('ikr.format:', name, v, fmt)
     return name + ' = [' + ', '.join([fmt % f for f in v]) + ']'
 
-################################################################################
-### TEST
+if __name__ == '__main__':
+    ################################################################################
+    ### TEST
+    import robot
 
-# p = array([.100, 0, .0])
-p = robot.HOME[:3]
-#p = [  221.5,     0.0000,   SHOULDER_HEIGHT + 30]
-#p = array([L2, 0, 183 + RHO])
-nhat = array([1, 0, 0])
-nhat = nhat/linalg.norm(nhat)
+    # p = array([200, 0, .0])
+    p = robot.HOME[:3]
+    # 
+    #p[0] = 100
+    p[1] = -200
+    #p[2] -= 400
+    #p[1] = -200
+    #p = [  221.5,     0.0000,   SHOULDER_HEIGHT + 30]
+    #p = array([L2, 0, 183 + RHO])
+    nhat = p
+    nhat = array([1, 0, 1])
+    nhat = nhat/linalg.norm(nhat)
 
-roll = 0
-theta = (ikr(SHOULDER_HEIGHT, L1, L2, RHO, p, nhat, roll))
-print(format('theta', theta / DEG, fmt), 'DEG')
-niryo = robot.robot
-niryo.move_joints(theta)
-print (format(' nhat', nhat, fmt))
-p, rpy = niryo.get_arm_pose()
-print (format('    p', p, fmt))
-print (format('  rpy', rpy / DEG, fmt))
+    roll = 0
+    theta = (ikr(SHOULDER_HEIGHT, L1, L2, RHO, p, nhat, roll))
+    
+    print(format('theta', theta / DEG, fmt), 'DEG')
+    niryo = robot.robot
+    niryo.move_joints(theta)
+    p, rpy = niryo.get_arm_pose()
+    print (format('    p', p, fmt))
+    print (format('  rpy', rpy / DEG, fmt))
 
 
-from niryo_one_python_api.niryo_one_api import *
-import rospy
-rospy.init_node('niryo_one_example_python_api')
+    from niryo_one_python_api.niryo_one_api import *
+    import rospy
+    rospy.init_node('niryo_one_example_python_api')
 
-n = NiryoOne()
-n.move_joints(theta)
+    n = NiryoOne()
+    n.move_joints(theta)
