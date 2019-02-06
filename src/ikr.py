@@ -161,7 +161,7 @@ if __name__ == '__main__':
     #p = [  221.5,     0.0000,   SHOULDER_HEIGHT + 30]
     #p = array([L2, 0, 183 + RHO])
     nhat = p
-    nhat = array([1, 0, 1])
+    nhat = array([1, 0, 0])
     nhat = nhat/linalg.norm(nhat)
 
     roll = 0
